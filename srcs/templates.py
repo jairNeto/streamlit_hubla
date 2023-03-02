@@ -4,7 +4,7 @@ def search_result(i: int, url: str, title: str, content: str, sim: float) -> str
     return f"""
         <div style="font-size:120%;">
             {i + 1}.
-            <a href="{url}">
+            <a href="{url}" target="_blank">
                 {title}
             </a>
         </div>
