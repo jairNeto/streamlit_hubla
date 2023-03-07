@@ -34,3 +34,16 @@ def get_top_k_similar_indices(text, k, tfidf, df_tfidf):
     return top_k_indices, top_k_similarities
 
 
+def get_top_k_similar_indices_faiss(text, search_index, df, k):
+    resp = search_index.similarity_search(text, k=k)
+    indexes = []
+    for i in range(k):
+      indexes.append(df[df['clean_content'] == resp[i].page_content].index[0])
+    
+    return indexes
+
+def get_sections_faiss(text, search_index, df, k=3):
+  indexes = get_top_k_similar_indices_faiss(text, search_index, df, k)
+  return df.iloc[indexes].section_id.values
+
+
