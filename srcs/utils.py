@@ -43,12 +43,19 @@ def get_collection(collection_name: str):
 
     return db.collection(collection_name)
 
-def insert_data(question: str, section: str, section_url:str, is_correct:bool, collection_name='hubla_kb'):
+def insert_feedback(question: str,
+                    section: str,
+                    section_url:str,
+                    is_correct:bool,
+                    correct_section:str = '',
+                    collection_name='hubla_kb') -> None:
     run_id = str(uuid.uuid4())
     doc_ref = get_collection(collection_name).document(run_id)
     doc_ref.set({
         u'pergunta': question,
         u'seção': section,
         u'seção_url': section_url,
-        u'is_correct': is_correct
+        u'is_correct': is_correct,
+        u'correct_section': correct_section,
+        u'created_at': firestore.SERVER_TIMESTAMP,
     })
