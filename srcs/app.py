@@ -3,10 +3,12 @@ import streamlit as st
 import pandas as pd
 import joblib
 from model import get_top_k_similar_indices, get_top_k_similar_indices_faiss
-from utils import get_results, get_sections
+from utils import get_results, get_sections, insert_data
 from templates import search_result, get_section_template
+import openai
 
 def main():
+    openai.api_key = st.secrets['open_ai_key']
     st.title('Pesquisa na KB de Hubla')
     search = st.text_input('Entre com o texto da pesquisa:')
     k = st.number_input('Entre com o número de seções que a pesquisa vai retornar:', 
@@ -21,10 +23,20 @@ def main():
     if search:
         index = get_top_k_similar_indices_faiss(search, search_index, hubla_df, k)
         sections = get_sections(index, hubla_df)
+        
         for i in range(k):
-            st.write(get_section_template(i, sections[i][0], sections[i][1], sections[i][2]),
+            section_url = sections[i][0]
+            section_title = sections[i][1]
+            section_content = sections[i][2]
+            st.write(get_section_template(i, section_url, section_title, section_content),
                      unsafe_allow_html=True)
-    
+            if st.button("👍", key=f"👍{i}"):
+                insert_data(search, section_title, section_url, True)
+                st.write(f"Obrigado")
+            
+            if st.button("👎", key=f"👎{i}"):
+                insert_data(search, section_title, section_url, False)
+                st.write(f"Obrigado")
 
     # if search:
     #     index, sims = get_top_k_similar_indices(search, k, tfidf, cleaned_hubla_df_tfidf)
